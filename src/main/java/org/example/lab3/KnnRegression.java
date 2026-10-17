@@ -1,5 +1,7 @@
 package org.example.lab3;
 
+import org.example.utils.models.Point;
+
 import java.util.Comparator;
 import java.util.List;
 
@@ -48,9 +50,5 @@ public class KnnRegression {
                 .mapToDouble(p -> weight(x, p))
                 .sum();
         return numerator / denominator;
-    }
-
-    public double error(Point p) {
-        return predict(p.x()) - p.y();
     }
 }

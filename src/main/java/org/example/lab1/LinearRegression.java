@@ -1,5 +1,8 @@
 package org.example.lab1;
 
+import org.example.utils.Metrics;
+import org.example.utils.models.Point;
+
 import java.util.List;
 
 import static java.lang.IO.println;
@@ -46,7 +49,7 @@ public class LinearRegression {
 
             if (it == 1 || it % (iterations / 10) == 0) {
                 println(String.format("итерация %5d:  w0 = %.10f,  w1 = %.10f,  MSE = %.10f",
-                        it, w0, w1, Metrics.mse(this, train)));
+                        it, w0, w1, Metrics.mse(this::predict, train)));
             }
         }
     }

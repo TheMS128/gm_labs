@@ -1,4 +1,4 @@
-package org.example.lab3;
+package org.example.utils.models;
 
 public record Point(double x, double y) {
 }

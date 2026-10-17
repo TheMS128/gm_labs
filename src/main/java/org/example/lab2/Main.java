@@ -1,18 +1,17 @@
 package org.example.lab2;
 
-import org.example.Lcg;
+import org.example.utils.Console;
+import org.example.utils.Dataset;
+import org.example.utils.Lcg;
+import org.example.utils.Metrics;
+import org.example.utils.Plot;
+import org.example.utils.models.LabeledPoint;
+import org.example.utils.models.Sample;
 
 import java.io.File;
-import java.io.FileDescriptor;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.DoubleStream;
-import java.util.stream.IntStream;
 
 import static java.lang.IO.println;
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class Main {
 
@@ -26,49 +25,33 @@ public class Main {
     static final double ALPHA = 0.0001;
     static final int ITERATIONS = 1_000_000;
 
-    static void main() throws Exception {
-        System.setOut(new PrintStream(new FileOutputStream(FileDescriptor.out), true, UTF_8));
-
+    static void main() {
+        Console.useUtf8();
         var rng = new Lcg(SEED);
 
         double a = rng.uniform(AB_MIN, AB_MAX);
         double b = rng.uniform(AB_MIN, AB_MAX);
-
-        double step = (X_MAX - X_MIN) / (N - 1);
-        List<LabeledPoint> points = IntStream.range(0, N)
-                .mapToDouble(i -> X_MIN + i * step)
-                .mapToObj(x -> {
-                    int k = (int) rng.uniform(0, 2);
-                    double y = a * x + b + Math.pow(-1, k + 1) + rng.normal(MU, SIGMA);
-                    return new LabeledPoint(x, y, k);
-                })
+        List<LabeledPoint> points = Dataset.grid(N, X_MIN, X_MAX)
+                .mapToObj(x -> point(x, a, b, rng))
                 .toList();
-
-        List<Double> lot = DoubleStream.generate(rng::uniform)
-                .limit(N)
-                .boxed()
-                .toList();
-        List<LabeledPoint> shuffled = IntStream.range(0, N)
-                .boxed()
-                .sorted(Comparator.comparingDouble(lot::get))
-                .map(points::get)
-                .toList();
-        List<LabeledPoint> train = shuffled.subList(0, M);
-        List<LabeledPoint> test = shuffled.subList(M, N);
+        Sample<LabeledPoint> sample = Dataset.split(points, M, rng);
 
         var model = new LogisticRegression(ALPHA, ITERATIONS);
-        model.fit(train);
+        model.fit(sample.train());
 
-        double trainBce = Metrics.bce(model, train);
-        double testAccuracy = Metrics.accuracy(model, test);
+        println();
+        println("Истинные: a = %.6f,  b = %.6f".formatted(a, b));
+        println("Модель:   w0 = %.6f  w1 = %.6f  w2 = %.6f".formatted(model.w0(), model.w1(), model.w2()));
+        println("Линия:    y = %.6f·x %+.6f".formatted(-model.w1() / model.w2(), -model.w0() / model.w2()));
+        println("BCE на обучающей = %.6f".formatted(Metrics.bce(model::predict, sample.train())));
+        println("Accuracy на тестовой = %.2f".formatted(Metrics.accuracy(model::classify, sample.test())));
 
-        println("");
-        println(String.format("Истинные: a = %.6f,  b = %.6f", a, b));
-        println(String.format("Модель:   w0 = %.6f  w1 = %.6f  w2 = %.6f", model.w0(), model.w1(), model.w2()));
-        println(String.format("Линия:    y = %.6f·x %+.6f", -model.w1() / model.w2(), -model.w0() / model.w2()));
-        println(String.format("BCE на обучающей = %.6f", trainBce));
-        println(String.format("Accuracy на тестовой = %.2f", testAccuracy));
+        Plot.classification(sample.train(), sample.test(), model::lineY, new File("classification.png"));
+    }
 
-        Plot.save(train, test, model, new File("classification.png"));
+    private static LabeledPoint point(double x, double a, double b, Lcg rng) {
+        int k = (int) rng.uniform(0, 2);
+        double y = a * x + b + Math.pow(-1, k + 1) + rng.normal(MU, SIGMA);
+        return new LabeledPoint(x, y, k);
     }
 }

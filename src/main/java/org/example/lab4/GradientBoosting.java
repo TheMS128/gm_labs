@@ -1,6 +1,8 @@
 package org.example.lab4;
 
-import org.example.Lcg;
+import org.example.utils.Lcg;
+import org.example.utils.Metrics;
+import org.example.utils.models.Point;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,10 +31,6 @@ public class GradientBoosting {
                 .sum();
     }
 
-    public double error(Point p) {
-        return predict(p.x()) - p.y();
-    }
-
     public double antigradient(Point p) {
         return 2 * (p.y() - predict(p.x()));
     }
@@ -51,7 +49,7 @@ public class GradientBoosting {
 
             if (k % Math.max(1, trees / 10) == 0) {
                 println(String.format("деревьев %5d:  RMSE на обучающей = %.6f",
-                        k, Metrics.rmse(this, train)));
+                        k, Metrics.rmse(this::predict, train)));
             }
         }
     }

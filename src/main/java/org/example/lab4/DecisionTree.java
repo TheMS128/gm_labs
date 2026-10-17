@@ -1,6 +1,9 @@
 package org.example.lab4;
 
-import org.example.Lcg;
+import org.example.lab4.models.Node;
+import org.example.lab4.models.Split;
+import org.example.utils.Lcg;
+import org.example.utils.models.Point;
 
 import java.util.Comparator;
 import java.util.List;
@@ -54,7 +57,7 @@ public class DecisionTree {
 
     private Split randomSplit(List<Point> points) {
         Map<Boolean, List<Point>> parts = points.stream()
-                .collect(Collectors.partitioningBy(p -> rng.uniform() < 0.5));
+                .collect(Collectors.partitioningBy(_ -> rng.uniform() < 0.5));
         return new Split(parts.get(true), parts.get(false));
     }
 

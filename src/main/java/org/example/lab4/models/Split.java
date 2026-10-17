@@ -1,4 +1,6 @@
-package org.example.lab4;
+package org.example.lab4.models;
+
+import org.example.utils.models.Point;
 
 import java.util.List;
 

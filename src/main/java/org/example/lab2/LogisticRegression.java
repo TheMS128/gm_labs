@@ -1,5 +1,8 @@
 package org.example.lab2;
 
+import org.example.utils.Metrics;
+import org.example.utils.models.LabeledPoint;
+
 import java.util.List;
 
 import static java.lang.IO.println;
@@ -69,7 +72,7 @@ public class LogisticRegression {
 
             if (it == 1 || it % (iterations / 10) == 0) {
                 println(String.format("итерация %6d:  w0 = %.6f,  w1 = %.6f,  w2 = %.6f,  BCE = %.6f",
-                        it, w0, w1, w2, Metrics.bce(this, train)));
+                        it, w0, w1, w2, Metrics.bce(this::predict, train)));
             }
         }
     }
