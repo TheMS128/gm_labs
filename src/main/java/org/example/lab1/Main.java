@@ -1,5 +1,7 @@
 package org.example.lab1;
 
+import org.example.Lcg;
+
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
@@ -21,7 +23,7 @@ public class Main {
     static final double MU = 0, SIGMA = 0.3;
 
     static final long SEED = 42;
-    static final double ALPHA = 0.05;
+    static final double ALPHA = 0.001;
     static final int ITERATIONS = 1000;
 
     static void main() throws Exception {

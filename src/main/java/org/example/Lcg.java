@@ -1,4 +1,4 @@
-package org.example.lab1;
+package org.example;
 
 import static java.lang.Math.PI;
 
